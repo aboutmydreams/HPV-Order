@@ -99,9 +99,9 @@ def GET(url, params=None, error_exit=False, **kwargs):
         error_response = f'URL:{url} ERROR:{err}'
         print('[error] in GET request : ', error_response)
         if error_exit:
-            send_email('程序已经退出：GET请求错误，' + error_response, subject="抢苗请求出错")
+            send_email(f'程序已经退出：GET请求错误，{error_response}', subject="抢苗请求出错")
             exit(1)
-        send_email('GET请求错误，' + error_response, subject="抢苗请求出错")
+        send_email(f'GET请求错误，{error_response}', subject="抢苗请求出错")
         return None
     else:
         res_json = response.json()
@@ -115,7 +115,7 @@ def GET(url, params=None, error_exit=False, **kwargs):
         if 'msg' in res_json:
             msg = res_json['msg']
             if '用户登录超时,请重新登入' in msg:
-                send_email('约苗提示错误消息：' + str(msg), subject="约苗登录超时")
+                send_email(f'约苗提示错误消息：{str(msg)}', subject="约苗登录超时")
                 print(msg + '\n结束抢苗')
                 exit(1)
         # print(_suc_msg)
@@ -146,7 +146,7 @@ def POST(url, params=None, error_exit=True, **kwargs):
         if 'msg' in res_json:
             msg = res_json['msg']
             if '用户登录超时,请重新登入' in msg:
-                send_email('约苗提示错误消息：' + str(msg), subject="约苗登录超时")
+                send_email(f'约苗提示错误消息：{str(msg)}', subject="约苗登录超时")
                 print(msg + '\n结束抢苗')
                 exit(1)
         return res_json
@@ -162,7 +162,7 @@ def get_server_time():
     # https://wx.scmttec.com/base//time/now.do
     res_json = GET(cfg.URLS['TIME_NOW'], headers=cfg.REQ_HEADERS, verify=False)  # TIME_NOW SERVER_TIME
     if not res_json['ok']:
-        print('[error]: 获取服务器时间有误：{}'.format(res_json['msg']))
+        print(f"[error]: 获取服务器时间有误：{res_json['msg']}")
         exit()
     # print(res_json)
     return res_json['data']
@@ -177,6 +177,6 @@ def get_server_time_miaomiao():
     """
     res_json = POST(cfg.URLS['SERVER_TIME'], verify=False)
     if not res_json['ok']:
-        print('[error]: 获取服务器时间有误：{}'.format(res_json['msg']))
+        print(f"[error]: 获取服务器时间有误：{res_json['msg']}")
         exit()
     return str(res_json['data'])

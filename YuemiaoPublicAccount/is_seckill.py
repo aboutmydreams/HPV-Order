@@ -118,9 +118,15 @@ def get_departments_info_by_province(province):
     """
     province_code = get_province_code(province=province)
     departments = get_all_departments(province_code)
-    save_json(departments, osp.join(cfg.save_departments_info_root, cfg.VACCINDE_INFO[cfg.customId],
-                                    province + '_社区信息.json'))
-    print('[info]: 从"{}"一共查找保存{}社区医院信息'.format(province, len(departments)))
+    save_json(
+        departments,
+        osp.join(
+            cfg.save_departments_info_root,
+            cfg.VACCINDE_INFO[cfg.customId],
+            f'{province}_社区信息.json',
+        ),
+    )
+    print(f'[info]: 从"{province}"一共查找保存{len(departments)}社区医院信息')
     return departments
 
 
@@ -129,7 +135,7 @@ def get_china_departments_info():
     departments = get_all_departments('')
     save_json(departments, osp.join(cfg.save_departments_info_root, cfg.VACCINDE_INFO[cfg.customId],
                                     '全国社区信息.json'))
-    print('[info]: 全国范围内一共查找保存{}社区医院信息'.format(len(departments)))
+    print(f'[info]: 全国范围内一共查找保存{len(departments)}社区医院信息')
     return departments
 
 
@@ -144,10 +150,18 @@ def query_is_seckill_by_province(province):
     departments = get_departments_info_by_province(province=province)
     results = is_seckill(departments)
     if len(results) != 0:
-        save_json(results, osp.join(cfg.save_departments_info_root, cfg.VACCINDE_INFO[cfg.customId],
-                                    province + "_社区医院可秒杀苗.json"))
+        save_json(
+            results,
+            osp.join(
+                cfg.save_departments_info_root,
+                cfg.VACCINDE_INFO[cfg.customId],
+                f"{province}_社区医院可秒杀苗.json",
+            ),
+        )
     # print(results)
-    print('[info]: 从"{}"查找的{}社区医院中一共有{}可以秒杀\n\n'.format(province, len(departments), len(results)))
+    print(
+        f'[info]: 从"{province}"查找的{len(departments)}社区医院中一共有{len(results)}可以秒杀\n\n'
+    )
     return results
 
 
@@ -164,5 +178,5 @@ def query_is_seckill_in_china():
         save_json(results, osp.join(cfg.save_departments_info_root, cfg.VACCINDE_INFO[cfg.customId],
                                     "全国社区医院可秒杀.json"))
     # print(results)
-    print('[info]: 全国范围内查找的{}社区医院信息中有{}社区可以秒杀\n\n'.format(len(departments), len(results)))
+    print(f'[info]: 全国范围内查找的{len(departments)}社区医院信息中有{len(results)}社区可以秒杀\n\n')
     return results

@@ -12,10 +12,7 @@ def convert(info_list):
     :param info_list: [{'name': '郑州市', 'value': '4101'},  ... , {'name': '济源市', 'value': '4190'}]
     :return: dict { '郑州市':4101, ... , '济源市':4190}
     """
-    dicts = {}
-    for item in info_list:
-        dicts[item['name']] = item['value']
-    return dicts
+    return {item['name']: item['value'] for item in info_list}
 
 
 def save_all_city_info():
@@ -29,15 +26,13 @@ def save_all_city_info():
     if not osp.exists(osp.join(save_root, 'provinces.json')):
         provinces = save_all_provinces()
     else:
-        f = open(osp.join(save_root, 'provinces.json'), encoding='utf-8')
-        provinces = json.load(f)
-        f.close()
-
+        with open(osp.join(save_root, 'provinces.json'), encoding='utf-8') as f:
+            provinces = json.load(f)
     for province in provinces:
-        if osp.exists(osp.join(save_root, province+'.json')):
+        if osp.exists(osp.join(save_root, f'{province}.json')):
             # 该省的信息已经存在，跳过
             continue
-        print('[info] : process {} province'.format(province))
+        print(f'[info] : process {province} province')
         p_value = provinces[province]
 
         params = {'parentCode': p_value}
@@ -51,7 +46,7 @@ def save_all_city_info():
 
             if len(str(c_value)) == 6:
                 # 直辖市
-                save_json(cities, osp.join(save_root, province + '.json'))
+                save_json(cities, osp.join(save_root, f'{province}.json'))
                 break
 
             params = {'parentCode': c_value}
@@ -61,8 +56,8 @@ def save_all_city_info():
             # 该城市的区信息
             result_province[city] = value
 
-        if len(result_province) != 0:
-            save_json(result_province, osp.join(save_root, province + '.json'))
+        if result_province:
+            save_json(result_province, osp.join(save_root, f'{province}.json'))
     print('save all info done.')
 
 
@@ -89,7 +84,7 @@ def save_all_provinces():
         return
     provinces = convert(result['data'])
     save_json(provinces, osp.join(save_root, 'provinces.json'))
-    print('[info]: 成功保存所有的省份编号信息到文件 {} 中'.format(osp.join(save_root, 'provinces.json')))
+    print(f"[info]: 成功保存所有的省份编号信息到文件 {osp.join(save_root, 'provinces.json')} 中")
     return provinces
 
 
@@ -103,10 +98,9 @@ def get_province_code(province):
     if not osp.exists(osp.join(cfg.save_city_code_root, 'provinces.json')):
         provinces = save_all_provinces()
     else:
-        f = open(osp.join(cfg.save_city_code_root, 'provinces.json'), encoding='utf-8')
-        provinces = json.load(f)
-        f.close()
+        with open(osp.join(cfg.save_city_code_root, 'provinces.json'), encoding='utf-8') as f:
+            provinces = json.load(f)
     if province not in provinces:
-        print('[error]: 你输入的省份"{}"不在已知的所有省份 {} 中'.format(province, provinces.keys()))
+        print(f'[error]: 你输入的省份"{province}"不在已知的所有省份 {provinces.keys()} 中')
         exit()
     return provinces[province]

@@ -118,14 +118,14 @@ def print_my_order_success_info(data):
     print('社区名称：', departmentName)
     print('社区地址：', address)
     print('社区电话：', tel)
-    print('社区工作时间：{} - {}'.format(worktime_start, worktime_end))
+    print(f'社区工作时间：{worktime_start} - {worktime_end}')
 
     print('疫苗信息：')
     print('疫苗名称：', vaccine_name)
     print('疫苗针次：', vaccine_name)
     print('疫苗厂商：', factoryName)
     for next in next_vaccine:
-        print('剩余的第 {} 针疫苗注射时间 {}'.format(next['vaccineIndex'], next['estimatedDate']))
+        print(f"剩余的第 {next['vaccineIndex']} 针疫苗注射时间 {next['estimatedDate']}")
 
 
 # 查询详细的预约信息
@@ -202,9 +202,12 @@ def get_my_order_info_by_subscribeId(subscribeId):
             "ok":true
         }
     """
-    # https://wx.scmttec.com/order/subscribe/clientDetail.do?id=4295641
-    response = GET(cfg.URLS['ORDER_INFO'], {"id": subscribeId}, headers=cfg.REQ_HEADERS, verify=False)
-    return response
+    return GET(
+        cfg.URLS['ORDER_INFO'],
+        {"id": subscribeId},
+        headers=cfg.REQ_HEADERS,
+        verify=False,
+    )
 
 
 # 判断预约条件
@@ -231,8 +234,9 @@ def judge_order(departmentCode, departmentVaccineId, vaccineCode, linkmanId):
         "vaccineCode": vaccineCode,  # 疫苗编码
         "linkmanId": linkmanId,
     }
-    response = GET(cfg.URLS['JUDGE_ORDER'], params, headers=cfg.REQ_HEADERS, verify=False)
-    return response
+    return GET(
+        cfg.URLS['JUDGE_ORDER'], params, headers=cfg.REQ_HEADERS, verify=False
+    )
 
 
 # 判断是否需要注册
@@ -258,8 +262,12 @@ def judge_isNeedRegister(departmentCode, departmentVaccineId, vaccineCode, linkm
         "vaccineCode": vaccineCode,  # 疫苗编码
         "linkmanId": linkmanId,  # 用户信息
     }
-    response = GET(cfg.URLS['JUDGE_REGISTER'], params, headers=cfg.REQ_HEADERS, verify=False)
-    return response
+    return GET(
+        cfg.URLS['JUDGE_REGISTER'],
+        params,
+        headers=cfg.REQ_HEADERS,
+        verify=False,
+    )
 
 
 # 选择特定社区、特定疫苗、特定针数下可选择的日期
@@ -294,8 +302,9 @@ def workdays(departmentCode, departmentVaccineId, vaccineCode, vaccIndex, linkma
         "vaccIndex": vaccIndex,  # 选择的针数
         "departmentVaccineId": departmentVaccineId,  # 部门疫苗id，也就是选择请求某一个医院的唯一标识
     }
-    response = GET(cfg.URLS['CHOOSE_NUM'], params, headers=cfg.REQ_HEADERS, verify=False)
-    return response
+    return GET(
+        cfg.URLS['CHOOSE_NUM'], params, headers=cfg.REQ_HEADERS, verify=False
+    )
 
 
 # 获取选择的日期中可以预约的人数
@@ -337,8 +346,12 @@ def findSubscribeAmountByDays(departmentCode, departmentVaccineId, vaccineCode, 
         "days": days,  # 选择的日期
         "departmentVaccineId": departmentVaccineId,  # 部门疫苗id，也就是选择请求某一个医院的唯一标识
     }
-    response = GET(cfg.URLS['GET_MAX_ORDER'], params, headers=cfg.REQ_HEADERS, verify=False)
-    return response
+    return GET(
+        cfg.URLS['GET_MAX_ORDER'],
+        params,
+        headers=cfg.REQ_HEADERS,
+        verify=False,
+    )
 
 
 # 查询某个日期下可以预约的时间点，并返回每个时间点内可以预约的人数
@@ -392,8 +405,12 @@ def departmentWorkTimes2(departmentCode, departmentVaccineId, vaccineCode, vaccI
         "departmentVaccineId": departmentVaccineId,  # 部门疫苗id，也就是选择请求某一个医院的唯一标识
         "linkmanId": linkmanId,  # 选择预约的人
     }
-    response = GET(cfg.URLS['CHOOSE_TIME_OF_DAY'], params, headers=cfg.REQ_HEADERS, verify=False)
-    return response
+    return GET(
+        cfg.URLS['CHOOSE_TIME_OF_DAY'],
+        params,
+        headers=cfg.REQ_HEADERS,
+        verify=False,
+    )
 
 
 # 社区编码 depaCode 中需要构造一个32位的编码字段值，防止超时提交的表单
@@ -416,7 +433,11 @@ def construct_departmentCode_32encode(subscirbeTime, now=None):
     # self._header['st'] = hashlib.md5(str(cur_time).encode('utf-8')).hexdigest()
     # print("cur_time: ", cur_time)
     # print("subscirbeTime id: ", subscirbeTime)
-    decodetime = cur_time.replace('-', '').replace(' ', '').replace(':', '')[0:12] + str(subscirbeTime) + end
+    decodetime = (
+        cur_time.replace('-', '').replace(' ', '').replace(':', '')[:12]
+        + str(subscirbeTime)
+        + end
+    )
     # decodetime = cur_time + str(subscirbeTime) + end
     # decodetime = str(now) + str(subscirbeTime) + end
     depaCode_md5 = hashlib.md5(str(decodetime).encode('utf-8')).hexdigest()
@@ -457,18 +478,19 @@ def startOrder(departmentCode, departmentVaccineId, vaccineCode, vaccIndex, subs
     # depaCode_md5='090ce172dbb4e8f5ac4cdc315922532c'
     depaCode_md5 = construct_departmentCode_32encode(subscirbeTime=subscirbeTime, now=now)
     params = {
-        "vaccineCode": vaccineCode,  # 疫苗编码
-        "vaccineIndex": vaccIndex,  # 选择的针数
-        "linkmanId": linkmanId,  # 选择预约的人
-        "subscribeDate": subscribeDate,  # 选择的日期
-        "subscirbeTime": subscirbeTime,  # 选择的时间,上面选择某一天日期获得的时间id
-        "departmentVaccineId": departmentVaccineId,  # 部门疫苗id，也就是选择请求某一个医院的唯一标识
-        "depaCode": str(departmentCode) + '_' + depaCode_md5,  # 部门编码，
-        "serviceFee": 0,  # 部门编码，组成：区号+区内部号
+        "vaccineCode": vaccineCode,
+        "vaccineIndex": vaccIndex,
+        "linkmanId": linkmanId,
+        "subscribeDate": subscribeDate,
+        "subscirbeTime": subscirbeTime,
+        "departmentVaccineId": departmentVaccineId,
+        "depaCode": f'{str(departmentCode)}_{depaCode_md5}',
+        "serviceFee": 0,
     }
-    print('[info]: 预约日期为：{}'.format(subscribeDate))
-    response = GET(cfg.URLS['START_ORDER'], params, headers=cfg.REQ_HEADERS, verify=False)
-    return response
+    print(f'[info]: 预约日期为：{subscribeDate}')
+    return GET(
+        cfg.URLS['START_ORDER'], params, headers=cfg.REQ_HEADERS, verify=False
+    )
 
 
 # 根据所有可预约的日期，依次选择每一天的每一个时间段去预约，直到有一个时间段预约成功或者全部的时间段都尝试预约结束
@@ -500,13 +522,15 @@ def loop_order_until_success(departmentCode, departmentVaccineId, vaccineCode, v
     for date in subscribeDates:
         maxSub = date['maxSub']
         subscribeDate = date['day']
-        print('[info]: 日期 {} 可以预约人数为 {}'.format(subscribeDate, maxSub))
+        print(f'[info]: 日期 {subscribeDate} 可以预约人数为 {maxSub}')
         if maxSub <= 0:
             # 改日期可预约人数为0，则继续判断下一天
             continue
 
         # 该天可预约人数不为0，选择某一个时间段预约，即获取该天的每一个时间段可预约的人数信息
-        subscribeDate = subscribeDate[0:4] + '-' + subscribeDate[4:6] + '-' + subscribeDate[6:8]
+        subscribeDate = (
+            f'{subscribeDate[:4]}-{subscribeDate[4:6]}-{subscribeDate[6:8]}'
+        )
         response = departmentWorkTimes2(departmentCode=departmentCode, departmentVaccineId=departmentVaccineId,
                                         vaccineCode=vaccineCode, vaccIndex=vaccIndex, subscribeDate=subscribeDate,
                                         linkmanId=linkmanId)
@@ -514,7 +538,9 @@ def loop_order_until_success(departmentCode, departmentVaccineId, vaccineCode, v
             continue
         if not response['ok']:
             # 请求该天的每一个时间段可预约人数失败！
-            print('[error]: 针数: {}, 日期: {}不可预约, {}'.format(cfg.vaccIndex, subscribeDate, response['msg']))
+            print(
+                f"[error]: 针数: {cfg.vaccIndex}, 日期: {subscribeDate}不可预约, {response['msg']}"
+            )
             continue
 
         # 成功请求到该天的每一个时间段可预约人数
@@ -523,7 +549,7 @@ def loop_order_until_success(departmentCode, departmentVaccineId, vaccineCode, v
         times = data['times']  # 该天的每一个时间段可预约人数详细信息
         if not times['ok']:
             # 获取该天的每一个时间段的可预约人数信息失败！
-            print('[error]: 获取时间点有误, {}'.format(response['msg']))
+            print(f"[error]: 获取时间点有误, {response['msg']}")
             continue
 
         # 成功获取该天的每一个时间段可预约的人数信息
@@ -556,9 +582,9 @@ def loop_order_until_success(departmentCode, departmentVaccineId, vaccineCode, v
                 continue
             subscirbeTime = time['id']
 
-            print('[info]: 日期 {}, 时间段 {} - {}, 时间段编号 {}, 可预约的人数为 {}'
-                  .format(subscribeDate, time['startTime'], time['endTime'], time['id'], time['maxSub']))
-
+            print(
+                f"[info]: 日期 {subscribeDate}, 时间段 {time['startTime']} - {time['endTime']}, 时间段编号 {subscirbeTime}, 可预约的人数为 {time['maxSub']}"
+            )
             # 第七步，选择时间之后，开始预约
             response = startOrder(departmentCode=departmentCode, departmentVaccineId=departmentVaccineId,
                                   vaccineCode=vaccineCode,
@@ -567,13 +593,14 @@ def loop_order_until_success(departmentCode, departmentVaccineId, vaccineCode, v
             if response is None:
                 continue
             if not response['ok']:
-                print('[error]: 日期 {}, 时间段 {} - {}, 预约失败， {}'
-                      .format(subscribeDate, time['startTime'], time['endTime'], response['msg']))
+                print(
+                    f"[error]: 日期 {subscribeDate}, 时间段 {time['startTime']} - {time['endTime']}, 预约失败， {response['msg']}"
+                )
 
                 # {"code":"3101","msg":"太多的重复请求!","notOk":true,"ok":false}
                 # {"code":"1101","msg":"下单操作频繁,请稍后再试吧!","notOk":true,"ok":false}
                 code = response['code']
-                if code == "1101" or code == "3101":
+                if code in ["1101", "3101"]:
                     sleep_time += 0.01
                     # 当前请求没有请求成功，所以重新请求当前时间段
                     current_time_index -= 1
@@ -602,7 +629,7 @@ def check_order_number(departmentCode, departmentVaccineId, linkmanId=8350927, u
     if username is not None:
         linkmanId = get_linkmanId_by_name(username)
         if linkmanId is None:
-            print('[error]: 输入的用户名 {} 没有在系统中注册'.format(username))
+            print(f'[error]: 输入的用户名 {username} 没有在系统中注册')
             return 0
     #####################################################################
 
@@ -612,7 +639,7 @@ def check_order_number(departmentCode, departmentVaccineId, linkmanId=8350927, u
     if response is None:
         return 0
     if not response['ok']:
-        print('[error]: 没有找到该社区的信息... , {}'.format(response['msg']))
+        print(f"[error]: 没有找到该社区的信息... , {response['msg']}")
         return 0
     departmentName = response['data']['departmentName']
     vaccineCode = response['data']['vaccineCode']
@@ -627,7 +654,7 @@ def check_order_number(departmentCode, departmentVaccineId, linkmanId=8350927, u
         return 0
     if not response['ok']:
         # print(response)
-        print('[error]: 没有可预约的疫苗... , {}'.format(response.get('msg', 'error_info')))
+        print(f"[error]: 没有可预约的疫苗... , {response.get('msg', 'error_info')}")
         return 0
     if response['data'] == 0:
         print('[error]: 该社区暂时没有可预约信息...')
@@ -663,7 +690,7 @@ def check_order_number(departmentCode, departmentVaccineId, linkmanId=8350927, u
     if response is None:
         return 0
     if not response['ok']:
-        print('[error]: 针数 {} 没有可预约日期, {}'.format(cfg.vaccIndex, response['msg']))
+        print(f"[error]: 针数 {cfg.vaccIndex} 没有可预约日期, {response['msg']}")
         return 0
     #####################################################################
 
@@ -677,7 +704,7 @@ def check_order_number(departmentCode, departmentVaccineId, linkmanId=8350927, u
     if response is None:
         return 0
     if not response['ok']:
-        print('[error]: 针数: {}, 日期: {}不可预约, {}'.format(cfg.vaccIndex, days, response['msg']))
+        print(f"[error]: 针数: {cfg.vaccIndex}, 日期: {days}不可预约, {response['msg']}")
         return 0
 
     subscribeDates = response['data']
@@ -689,12 +716,12 @@ def check_order_number(departmentCode, departmentVaccineId, linkmanId=8350927, u
         # "maxSub":461, "day":"20210114"
         maxSub = sub_data['maxSub']
         date = sub_data['day']
-        print('日期：{}可预约人数：{}'.format(date, maxSub))
+        print(f'日期：{date}可预约人数：{maxSub}')
         if maxSub != 0:
             # TODO 发送短信提示，该日期可以预约
-            print('日期：{}可预约人数：{}'.format(date, maxSub))
+            print(f'日期：{date}可预约人数：{maxSub}')
             if len(departmentName) > 12:
-                departmentName = departmentName[0:12]
+                departmentName = departmentName[:12]
             # print(departmentName)
             send_text_message([departmentName, str(maxSub)])
             return subscribeDates
@@ -720,7 +747,7 @@ def order_immediately(departmentCode, departmentVaccineId, linkmanId=8350927, us
     if username is not None:
         linkmanId = get_linkmanId_by_name(username)
         if linkmanId is None:
-            print('[error]: 输入的用户名 {} 没有在系统中注册'.format(username))
+            print(f'[error]: 输入的用户名 {username} 没有在系统中注册')
             return 0
     #####################################################################
 
@@ -730,7 +757,7 @@ def order_immediately(departmentCode, departmentVaccineId, linkmanId=8350927, us
     if response is None:
         return
     if not response['ok']:
-        print('[error]: 没有找到该社区的信息... , {}'.format(response['msg']))
+        print(f"[error]: 没有找到该社区的信息... , {response['msg']}")
         return
     departmentName = response['data']['departmentName']
     vaccineCode = response['data']['vaccineCode']
@@ -745,7 +772,7 @@ def order_immediately(departmentCode, departmentVaccineId, linkmanId=8350927, us
         return
     if not response['ok']:
         # print(response)
-        print('[error]: 没有可预约的疫苗... , {}'.format(response.get('msg', 'error_info')))
+        print(f"[error]: 没有可预约的疫苗... , {response.get('msg', 'error_info')}")
         return
     if response['data'] == 0:
         print('[error]: 该社区暂时没有可预约信息...')
@@ -781,7 +808,7 @@ def order_immediately(departmentCode, departmentVaccineId, linkmanId=8350927, us
     if response is None:
         return
     if not response['ok']:
-        print('[error]: 针数 {} 没有可预约日期, {}'.format(cfg.vaccIndex, response['msg']))
+        print(f"[error]: 针数 {cfg.vaccIndex} 没有可预约日期, {response['msg']}")
         return
     #####################################################################
 
@@ -795,7 +822,7 @@ def order_immediately(departmentCode, departmentVaccineId, linkmanId=8350927, us
     if response is None:
         return
     if not response['ok']:
-        print('[error]: 针数: {}, 日期: {}不可预约, {}'.format(cfg.vaccIndex, days, response['msg']))
+        print(f"[error]: 针数: {cfg.vaccIndex}, 日期: {days}不可预约, {response['msg']}")
         return
 
     subscribeDates = response['data']

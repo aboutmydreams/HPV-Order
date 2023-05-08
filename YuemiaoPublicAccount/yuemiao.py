@@ -20,7 +20,6 @@ class YueMiao:
     def __init__(self, tk, cookie):
         cfg.REQ_HEADERS['tk'] = tk
         cfg.REQ_HEADERS['cookie'] = cookie
-        pass
 
     def subscribe_by_province(self, province):
         """
@@ -47,7 +46,7 @@ class YueMiao:
                                                linkmanId=linkmanId)
             if flag:
                 count += 1
-        print('[info]: 一共订阅了{}个社区医院'.format(count))
+        print(f'[info]: 一共订阅了{count}个社区医院')
         # subscribe(depaCode=departments['data']['regionCode'],
         #           depaVaccId=departments['data']['depaVaccId'], linkmanId=linkmanId)
 
@@ -58,14 +57,14 @@ class YueMiao:
         :return:
         """
         if cfg.customId not in cfg.VACCINDE_INFO:
-            print('[error]: 配置文件中疫苗的规格“customId”配置有误，需要从{}中选择'.format(cfg.VACCINDE_INFO.keys()))
+            print(f'[error]: 配置文件中疫苗的规格“customId”配置有误，需要从{cfg.VACCINDE_INFO.keys()}中选择')
             print(cfg.VACCINDE_INFO)
             exit()
         print('#' * 50)
         print('#' * 20 + ' 抢苗信息 ' + '#' * 20)
-        print('抢苗用户：{}'.format(cfg.username))
-        print("抢苗规格：{}".format(cfg.VACCINDE_INFO[cfg.customId]))
-        print("抢苗的社区医院：{}".format(departmentName))
+        print(f'抢苗用户：{cfg.username}')
+        print(f"抢苗规格：{cfg.VACCINDE_INFO[cfg.customId]}")
+        print(f"抢苗的社区医院：{departmentName}")
         print('#' * 50)
         print()
 
@@ -73,21 +72,20 @@ class YueMiao:
 
         departments = get_department_by_name(name=departmentName)
         if len(departments) == 0:
-            print('[error]: 您输入的社区名字"{}"暂时没有找到...'.format(departmentName))
+            print(f'[error]: 您输入的社区名字"{departmentName}"暂时没有找到...')
             exit()
 
-        print('[info]: 一共查找到{}个与"{}"相关的社区医院'
-              .format(len(departments), departmentName))
+        print(f'[info]: 一共查找到{len(departments)}个与"{departmentName}"相关的社区医院')
 
         linkmanId = get_linkmanId_by_name(cfg.username)
         if linkmanId is None:
-            print('[error]: 输入的用户名 {} 没有在系统中注册'.format(cfg.username))
+            print(f'[error]: 输入的用户名 {cfg.username} 没有在系统中注册')
             return 0
         while True:
 
             for department in departments:
                 print()
-                print('[info]: 处理{}社区医院...'.format(department['name']))
+                print(f"[info]: 处理{department['name']}社区医院...")
                 departmentCode = department['code']
                 departmentVaccineId = department['depaVaccId']
 
@@ -114,19 +112,19 @@ class YueMiao:
             print('请输入省份或者区域id')
             exit()
         if cfg.customId not in cfg.VACCINDE_INFO:
-            print('[error]: 配置文件中疫苗的规格“customId”配置有误，需要从{}中选择'.format(cfg.VACCINDE_INFO.keys()))
+            print(f'[error]: 配置文件中疫苗的规格“customId”配置有误，需要从{cfg.VACCINDE_INFO.keys()}中选择')
             print(cfg.VACCINDE_INFO)
             exit()
         print('#' * 50)
         print('#' * 20 + ' 抢苗信息 ' + '#' * 20)
-        print('抢苗用户：{}'.format(cfg.username))
-        print("抢苗规格：{}".format(cfg.VACCINDE_INFO[cfg.customId]))
+        print(f'抢苗用户：{cfg.username}')
+        print(f"抢苗规格：{cfg.VACCINDE_INFO[cfg.customId]}")
 
         if regionCode is None:
             regionCode = get_province_code(province=province)
-            print("抢苗的省份：{}".format(province))
+            print(f"抢苗的省份：{province}")
         else:
-            print("抢苗的区域id为：{}".format(regionCode))
+            print(f"抢苗的区域id为：{regionCode}")
         print('#' * 50)
         print()
 
@@ -134,7 +132,7 @@ class YueMiao:
 
         linkmanId = get_linkmanId_by_name(cfg.username)
         if linkmanId is None:
-            print('[error]: 输入的用户名 {} 没有在系统中注册'.format(cfg.username))
+            print(f'[error]: 输入的用户名 {cfg.username} 没有在系统中注册')
             return False
 
         success = ""
@@ -144,10 +142,10 @@ class YueMiao:
             # 一遍又一遍的首先查找区域所有的医院，然后再遍历每一个医院开始预约
             departments = get_all_departments(regionCode=regionCode)
             if len(departments) == 0:
-                print('[error]: 您输入的省份"{}"暂时没有找到存在的社区医院...'.format(province))
+                print(f'[error]: 您输入的省份"{province}"暂时没有找到存在的社区医院...')
                 exit()
-            print('第{}次轮询查找：'.format(index))
-            print('[info]: 在{}中一共查找到{}个社区医院'.format(province, len(departments)))
+            print(f'第{index}次轮询查找：')
+            print(f'[info]: 在{province}中一共查找到{len(departments)}个社区医院')
 
             can_order = []
 
@@ -157,31 +155,37 @@ class YueMiao:
                 departmentVaccineId = department['depaVaccId']
                 name = department['name']
                 print()
-                print('[info]: 查询"{}"社区信息'.format(name))
+                print(f'[info]: 查询"{name}"社区信息')
                 result = check_order_number(departmentCode=departmentCode, departmentVaccineId=departmentVaccineId,
                                             linkmanId=linkmanId)
                 # print('re:', result)
                 if result is None or result == 0:
-                    print('"{}"社区医院可预约人数为0...'.format(name))
+                    print(f'"{name}"社区医院可预约人数为0...')
                 else:
-                    print('"{}"社区医院可以预约'.format(name))
+                    print(f'"{name}"社区医院可以预约')
                     content = str(department) + '\n' + str(result)
                     can_order.append(content)
                     send_email(content, subject="约苗疫苗可预约")
-                    # return True
+                                # return True
                 time.sleep(5)
-            if len(can_order) > 0:
-                print('[info]: 一共有{}个社区医院可以预约'.format(len(can_order)))
+            if can_order:
+                print(f'[info]: 一共有{len(can_order)}个社区医院可以预约')
                 send_email(',\n'.join(can_order), subject="约苗疫苗可预约")
                 return True
             time_end = time.time()
-            print('[info]: 第{}轮查找耗时{}\n\n'.format(index, time_end - time_start))
+            print(f'[info]: 第{index}轮查找耗时{time_end - time_start}\n\n')
             index += 1
 
     def query_arrive_vaccine_by_province(self, province):
         result = query_is_arrive_vaccine_by_province(province=province)
-        save_excel(result, osp.join(cfg.save_departments_info_root, cfg.VACCINDE_INFO[cfg.customId],
-                                    province + '_社区疫苗已经到苗.xls'))
+        save_excel(
+            result,
+            osp.join(
+                cfg.save_departments_info_root,
+                cfg.VACCINDE_INFO[cfg.customId],
+                f'{province}_社区疫苗已经到苗.xls',
+            ),
+        )
 
     def query_arrive_vaccine_in_china(self):
         result = query_is_arrive_vaccine_in_china()
@@ -190,18 +194,36 @@ class YueMiao:
 
     def get_all_departments_by_province(self, province):
         departments = get_departments_info_by_province(province=province)
-        save_excel(departments, osp.join(cfg.save_departments_info_root, cfg.VACCINDE_INFO[cfg.customId],
-                                         province + '_社区信息.xls'))
+        save_excel(
+            departments,
+            osp.join(
+                cfg.save_departments_info_root,
+                cfg.VACCINDE_INFO[cfg.customId],
+                f'{province}_社区信息.xls',
+            ),
+        )
 
     def get_all_departments_by_name(self, name):
         departments = get_department_by_name(name=name)
-        save_excel(departments, osp.join(cfg.save_departments_info_root, cfg.VACCINDE_INFO[cfg.customId],
-                                         name + '_社区信息.xls'))
+        save_excel(
+            departments,
+            osp.join(
+                cfg.save_departments_info_root,
+                cfg.VACCINDE_INFO[cfg.customId],
+                f'{name}_社区信息.xls',
+            ),
+        )
         print(departments)
-        print('[info]: 保存关于社区"{}"的信息成功'.format(name))
+        print(f'[info]: 保存关于社区"{name}"的信息成功')
 
     def get_all_departments_by_code(self, regionCode):
         departments = get_all_departments(regionCode=regionCode)
-        save_excel(departments, osp.join(cfg.save_departments_info_root, cfg.VACCINDE_INFO[cfg.customId],
-                                         regionCode + '_社区信息.xls'))
-        print('[info]: 保存"{}"编码地区的信息成功'.format(regionCode))
+        save_excel(
+            departments,
+            osp.join(
+                cfg.save_departments_info_root,
+                cfg.VACCINDE_INFO[cfg.customId],
+                f'{regionCode}_社区信息.xls',
+            ),
+        )
+        print(f'[info]: 保存"{regionCode}"编码地区的信息成功')
