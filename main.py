@@ -67,7 +67,7 @@ if __name__ == '__main__':
     elif op == 'save':
         if province is not None and province != "":
             # 保存某个省的所有一到疫苗的社区信息
-            print("[info]: 查找{}内的已经到苗信息".format(province))
+            print(f"[info]: 查找{province}内的已经到苗信息")
             yuemiao.query_arrive_vaccine_by_province(province=province)
         else:
             # 保存全国所有一到疫苗的社区信息
@@ -82,6 +82,5 @@ if __name__ == '__main__':
             yuemiao.get_all_departments_by_province(province=province)
 
     else:
-        print('[error]: 你输入的操作"{}" 不是 "[ order | subscribe | save | info ]"里的一个'
-              .format(op))
+        print(f'[error]: 你输入的操作"{op}" 不是 "[ order | subscribe | save | info ]"里的一个')
 

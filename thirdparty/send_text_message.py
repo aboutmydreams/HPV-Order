@@ -18,9 +18,10 @@ class ZhenziSmsClient(object):
         if 'templateParams' in data:
             data['templateParams'] = json.dumps(data['templateParams'])
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-        response = requests.post(self.apiUrl + '/sms/v2/send.do', data=data, verify=False)
-        result = str(response.content, 'utf-8')
-        return result
+        response = requests.post(
+            f'{self.apiUrl}/sms/v2/send.do', data=data, verify=False
+        )
+        return str(response.content, 'utf-8')
 
     def balance(self):
         data = {
@@ -28,9 +29,10 @@ class ZhenziSmsClient(object):
             'appSecret': self.appSecret
         }
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning);
-        response = requests.post(self.apiUrl + '/account/balance.do', data=data, verify=False);
-        result = str(response.content, 'utf-8');
-        return result;
+        response = requests.post(
+            f'{self.apiUrl}/account/balance.do', data=data, verify=False
+        );
+        return str(response.content, 'utf-8')
 
     def findSmsByMessageId(self, messageId):
         data = {
@@ -39,9 +41,10 @@ class ZhenziSmsClient(object):
             'messageId': messageId
         }
         requests.packages.urllib3.disable_warnings(InsecureRequestWarning);
-        response = requests.post(self.apiUrl + '/smslog/findSmsByMessageId.do', data=data, verify=False);
-        result = str(response.content, 'utf-8');
-        return result;
+        response = requests.post(
+            f'{self.apiUrl}/smslog/findSmsByMessageId.do', data=data, verify=False
+        );
+        return str(response.content, 'utf-8')
 
 
 # 发送短信提醒
@@ -60,7 +63,9 @@ def send_text_message(result):
     if 'templateParams' in data:
         data['templateParams'] = json.dumps(data['templateParams'])
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-    response = requests.post(cfg.zhenzi_url + '/sms/v2/send.do', data=data, verify=False)
+    response = requests.post(
+        f'{cfg.zhenzi_url}/sms/v2/send.do', data=data, verify=False
+    )
     result = str(response.content, 'utf-8')
     print(result)
     return result
@@ -71,10 +76,11 @@ def test():
     AppId = 123456
     AppSecre = '12345678-1234-1234-1234-123456789123'
 
-    params = {}
-    params['number'] = '15927037762'
-    params['templateId'] = '3338'
-    params['templateParams'] = ['9988', '15分钟']
+    params = {
+        'number': '15927037762',
+        'templateId': '3338',
+        'templateParams': ['9988', '15分钟'],
+    }
     client = ZhenziSmsClient(url, AppId, AppSecre)
     print(client.send(params))
 

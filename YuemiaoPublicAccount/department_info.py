@@ -109,7 +109,7 @@ def get_all_department_vaccine_infos(regionCode):
         depaVaccId = department['depaVaccId']
         departmentVaccineInfo = get_department_vaccine_info(depaVaccId=depaVaccId)
         if not departmentVaccineInfo['ok']:
-            print('[warning]: 获取社区医院“{}”失败'.format(department['name']))
+            print(f"[warning]: 获取社区医院“{department['name']}”失败")
             continue
         info = departmentVaccineInfo['data']
         departmentVaccineInfos.append(info)
@@ -172,12 +172,7 @@ def get_department_by_name(name):
         res = GET(cfg.URLS['ALL_DEPARTMENTS'], params, headers=cfg.REQ_HEADERS, verify=False)
     # print(res)
     departments = res['data']['rows']
-    if len(departments) == 0:
-        # print('[error]: 您输入的社区名字"{}"暂时没有找到...'.format(name))
-        return []
-    # save_json(departments, osp.join(cfg.save_departments_info_root,cfg.VACCINDE_INFO[cfg.customId],
-    #                                name + '.json'))
-    return departments
+    return [] if len(departments) == 0 else departments
 
 
 # 根据区域id获取该区域的所有的医院信息
@@ -250,7 +245,5 @@ def get_all_departments(regionCode='4101'):
         print(params)
         res = GET(cfg.URLS['ALL_DEPARTMENTS'], params, headers=cfg.REQ_HEADERS, verify=False)
 
-    departments = res['data']['rows']
-
-    return departments
+    return res['data']['rows']
 

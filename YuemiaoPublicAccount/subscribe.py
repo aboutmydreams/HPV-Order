@@ -128,13 +128,12 @@ def get_my_subscribe_info_by_registerDetailId(registerDetailId):
         "ok":true
     }
     """
-    # https://wx.scmttec.com/passport/register/registerRanking.do?registerDetailId=23300858
-    # https://wx.scmttec.com/passport/register/myRegisterItem.do?registerDetailId=23379350
-    # response = GET(cfg.URLS['SUBSCRIBE_INFO_RANK'], {"registerDetailId": registerDetailId},
-    #                headers=cfg.REQ_HEADERS, verify=False)
-    response = GET(cfg.URLS['SUBSCRIBE_INFO'], {"registerDetailId": registerDetailId},
-                   headers=cfg.REQ_HEADERS, verify=False)
-    return response
+    return GET(
+        cfg.URLS['SUBSCRIBE_INFO'],
+        {"registerDetailId": registerDetailId},
+        headers=cfg.REQ_HEADERS,
+        verify=False,
+    )
 
 
 def delete_subscribe(registerDetailId):
@@ -149,9 +148,12 @@ def delete_subscribe(registerDetailId):
         "ok":true
     }
     """
-    # GET https://wx.scmttec.com/passport/register/delete.do?registerDetailId=23379350
-    response = GET(cfg.URLS['SUBSCRIBE'], {'registerDetailId': registerDetailId}, headers=cfg.REQ_HEADERS, verify=False)
-    return response
+    return GET(
+        cfg.URLS['SUBSCRIBE'],
+        {'registerDetailId': registerDetailId},
+        headers=cfg.REQ_HEADERS,
+        verify=False,
+    )
 
 
 def subscribe(depaCode, depaVaccId, linkmanId, vaccineCode=8803):
@@ -229,7 +231,7 @@ def subscribe_by_region_id(regionCode, linkmanId=8350927, username=None):
     if username is not None:
         linkmanId = get_linkmanId_by_name(username)
         if linkmanId is None:
-            print('[error]: 输入的用户名 {} 没有在系统中注册'.format(username))
+            print(f'[error]: 输入的用户名 {username} 没有在系统中注册')
             return 0
 
     departments = get_all_departments(regionCode)
@@ -250,14 +252,13 @@ def subscribe_by_province(province):
     :param province: 省名字
     :return: count,成功订阅的数量
     """
-    p_json = osp.join(cfg.save_city_code_root, province + '.json')
+    p_json = osp.join(cfg.save_city_code_root, f'{province}.json')
     if not osp.exists(p_json):
         if osp.exists(osp.join(cfg.save_city_code_root, 'provinces.json')):
-            f = open(osp.join(cfg.save_city_code_root, 'provinces.json'), encoding='utf-8')
-            provinces = json.load(f)
-            f.close()
+            with open(osp.join(cfg.save_city_code_root, 'provinces.json'), encoding='utf-8') as f:
+                provinces = json.load(f)
             if province not in provinces.keys():
-                print('[error]: 你输入的省份"{}"不在已知的所有省份 {} 中'.format(province, provinces.keys()))
+                print(f'[error]: 你输入的省份"{province}"不在已知的所有省份 {provinces.keys()} 中')
                 return
         else:
             save_all_city_info()
@@ -265,27 +266,27 @@ def subscribe_by_province(province):
         provinces = os.listdir(cfg.save_city_code_root)
         provinces = [p.split('.')[0] for p in provinces]
         provinces.remove('provinces')
-        print('[error]: 你输入的省份"{}"不在已知的所有省份 {} 中'.format(province, provinces))
+        print(f'[error]: 你输入的省份"{province}"不在已知的所有省份 {provinces} 中')
         return
     count = 0
     linkmanId = get_linkmanId_by_name(cfg.username)
     if linkmanId is None:
-        print('[error]: 配置文件 config.py 中输入的用户名(username) {} 没有在系统中注册'.format(cfg.username))
+        print(f'[error]: 配置文件 config.py 中输入的用户名(username) {cfg.username} 没有在系统中注册')
         return
 
     with open(p_json, encoding='utf-8') as f:
         cities = json.load(f)
         for city in cities:
             if 'area' not in cities[city]:
-                print("[info]: 处理直辖市{}的{}".format(province, city))
+                print(f"[info]: 处理直辖市{province}的{city}")
                 regionCode = cities[city]
                 count += subscribe_by_region_id(regionCode=regionCode, linkmanId=linkmanId)
             else:
-                print('[info]: 处理城市：{}...'.format(city))
+                print(f'[info]: 处理城市：{city}...')
                 areas = cities[city]['area']
                 for area in areas:
-                    print('\t[info]: 处理 {} 的 {}...'.format(city, area))
+                    print(f'\t[info]: 处理 {city} 的 {area}...')
                     regionCode = areas[area]
                     count += subscribe_by_region_id(regionCode=regionCode, linkmanId=linkmanId)
-    print('[info]: 一共成功订阅 {} 个社区医院'.format(count))
+    print(f'[info]: 一共成功订阅 {count} 个社区医院')
     return count

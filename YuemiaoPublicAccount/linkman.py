@@ -49,9 +49,7 @@ def get_all_users():
         "ok":true
     }
     """
-    # https://wx.scmttec.com/order/linkman/findByUserId.do
-    response = GET(cfg.URLS['ALL_USER'], headers=cfg.REQ_HEADERS, verify=False)
-    return response
+    return GET(cfg.URLS['ALL_USER'], headers=cfg.REQ_HEADERS, verify=False)
 
 
 # 根据用户输入的名字查询该用户的 linkmanId
@@ -63,16 +61,16 @@ def get_linkmanId_by_name(query_name):
     """
     response = get_all_users()
     if not response['ok']:
-        print('[error]: 获取用户信息失败：{}'.format(response.get('msg', 'error')))
+        print(f"[error]: 获取用户信息失败：{response.get('msg', 'error')}")
         exit()
-        # return None
+            # return None
     data = response['data']
     if len(data) == 0:
         print('[error]: 当前系统中还没有添加用户信息...')
         return None
     items = {item['name']: item['id'] for item in data}
     if query_name not in items:
-        print('[error]: 当前系统中所有用户为 {}, 暂时没有添加用户 {}'.format(items.keys(), query_name))
+        print(f'[error]: 当前系统中所有用户为 {items.keys()}, 暂时没有添加用户 {query_name}')
         return None
     return items[query_name]
 
@@ -110,5 +108,9 @@ def check_linkman(depaCode, depaVaccId, productId, linkmanId=8350927, vaccineCod
         'productId': productId,
         'linkmanId': linkmanId
     }
-    response = GET(cfg.URLS['SUBSCRIBE_CHECK'], params, headers=cfg.REQ_HEADERS, verify=False)
-    return response
+    return GET(
+        cfg.URLS['SUBSCRIBE_CHECK'],
+        params,
+        headers=cfg.REQ_HEADERS,
+        verify=False,
+    )

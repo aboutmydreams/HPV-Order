@@ -94,7 +94,7 @@ def is_arrive_vaccine(departmentVaccineInfos):
             continue
         departments = get_department_by_name(departmentName)
         if len(departments) == 0:
-            print('社区{}暂时没有找到...'.format(departmentName))
+            print(f'社区{departmentName}暂时没有找到...')
             continue
         department = departments[0]
         address = department['address']
@@ -148,9 +148,15 @@ def get_department_vaccine_info_by_province(province):
     """
     province_code = get_province_code(province=province)
     departmentVaccineInfos = get_all_department_vaccine_infos(province_code)
-    save_json(departmentVaccineInfos, osp.join(cfg.save_departments_info_root, cfg.VACCINDE_INFO[cfg.customId],
-                                               province + '_社区疫苗信息.json'))
-    print('[info]: 从"{}"一共查找保存{}社区疫苗信息'.format(province, len(departmentVaccineInfos)))
+    save_json(
+        departmentVaccineInfos,
+        osp.join(
+            cfg.save_departments_info_root,
+            cfg.VACCINDE_INFO[cfg.customId],
+            f'{province}_社区疫苗信息.json',
+        ),
+    )
+    print(f'[info]: 从"{province}"一共查找保存{len(departmentVaccineInfos)}社区疫苗信息')
     return departmentVaccineInfos
 
 
@@ -159,7 +165,7 @@ def get_china_department_vaccine_info():
     departmentVaccineInfos = get_all_department_vaccine_infos('')
     save_json(departmentVaccineInfos, osp.join(cfg.save_departments_info_root, cfg.VACCINDE_INFO[cfg.customId],
                                                '全国社区疫苗信息.json'))
-    print('[info]: 全国范围内一共查找保存{}社区疫苗信息'.format(len(departmentVaccineInfos)))
+    print(f'[info]: 全国范围内一共查找保存{len(departmentVaccineInfos)}社区疫苗信息')
     return departmentVaccineInfos
 
 
@@ -174,10 +180,18 @@ def query_is_arrive_vaccine_by_province(province):
     departmentVaccineInfos = get_department_vaccine_info_by_province(province=province)
     results = is_arrive_vaccine(departmentVaccineInfos)
     if len(results) != 0:
-        save_json(results, osp.join(cfg.save_departments_info_root, cfg.VACCINDE_INFO[cfg.customId],
-                                    province + "_社区疫苗已经到苗.json"))
+        save_json(
+            results,
+            osp.join(
+                cfg.save_departments_info_root,
+                cfg.VACCINDE_INFO[cfg.customId],
+                f"{province}_社区疫苗已经到苗.json",
+            ),
+        )
     # print(results)
-    print('[info]: 从"{}"查找保存的{}社区疫苗信息中一共有{}社区医院已经到苗\n\n'.format(province, len(departmentVaccineInfos), len(results)))
+    print(
+        f'[info]: 从"{province}"查找保存的{len(departmentVaccineInfos)}社区疫苗信息中一共有{len(results)}社区医院已经到苗\n\n'
+    )
     return results
 
 
@@ -194,5 +208,7 @@ def query_is_arrive_vaccine_in_china():
         save_json(results, osp.join(cfg.save_departments_info_root, cfg.VACCINDE_INFO[cfg.customId],
                                     "全国社区疫苗已经到苗.json"))
     # print(results)
-    print('[info]: 全国范围内查找保存{}社区疫苗信息中有{}社区医院已经到苗\n\n'.format(len(departmentVaccineInfos), len(results)))
+    print(
+        f'[info]: 全国范围内查找保存{len(departmentVaccineInfos)}社区疫苗信息中有{len(results)}社区医院已经到苗\n\n'
+    )
     return results

@@ -54,7 +54,8 @@ def get_vaccine_info(depaCode, depaVaccId, vaccineCode=8803):
         'departmentVaccineId': depaVaccId,
         'vaccineCode': vaccineCode,
     }
-    response = GET(cfg.URLS['VACCINE_INFO'], params, headers=cfg.REQ_HEADERS, verify=False)
-    return response
+    return GET(
+        cfg.URLS['VACCINE_INFO'], params, headers=cfg.REQ_HEADERS, verify=False
+    )
 
 
